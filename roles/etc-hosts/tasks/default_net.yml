@@ -1,0 +1,8 @@
+---
+# Edit /etc/hosts with defailt ip address
+ - name: edit /etc/hosts
+   ansible.builtin.lineinfile:
+     path: /etc/hosts
+     line: "{{ hostvars[item]['ansible_default_ipv4']['address'] }}\t{{ hostvars[item]['inventory_hostname'] }}\t{{ hostvars[item]['inventory_hostname'] }}.{{domain_name }}"
+   with_items:
+     - "{{ groups['all'] }}"

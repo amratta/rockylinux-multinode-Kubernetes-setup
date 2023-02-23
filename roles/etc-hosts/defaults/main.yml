@@ -1,0 +1,5 @@
+---
+# defaults file for etc-hosts
+domain_name: "k8s.local"
+use_k8s_network: false
+k8s_internal_network: "172.31.255.0/24"

@@ -1,0 +1,91 @@
+---
+# tasks file for longhorn
+ - block:
+   - name: Install LongHorn Required RPMs
+     ansible.builtin.yum:
+      name: "{{ RPMs }}"
+      update_cache: yes
+      state: present
+     vars:
+      RPMs:
+       - curl
+       - grep
+       - gawk
+       - util-linux
+       - nfs-utils
+  
+   - name: Install Iscsci
+     shell:
+       cmd: "{{ item }}"
+     loop:
+      - yum --setopt=tsflags=noscripts install iscsi-initiator-utils -y
+      - echo "InitiatorName=$(/sbin/iscsi-iname)" > /etc/iscsi/initiatorname.iscsi
+      - modprobe iscsi_tcp
+  
+   - name: start iscsi daemons
+     ansible.builtin.service:
+      name: iscsid
+      state: started
+      enabled: yes
+  
+   - name: Enable Mount Propgation
+     ansible.builtin.lineinfile:
+      path: /etc/systemd/system/multi-user.target.wants/containerd.service
+      insertafter: "ExecStart"
+      line: MountFlags=shared
+  
+   - name: Restart Containerd
+     ansible.builtin.systemd:
+      state: restarted
+      enabled: yes
+      daemon_reload: true
+      name: containerd
+  
+   - block:   
+      - name: clear PVS Devices
+        shell:
+          cmd: "dd if=/dev/zero of={{ item }} bs=1M count=1"
+        loop: "{{ lvm_pvs_devices |  list }}"
+     
+      - name: Create LongHorn Volume Group (longhorn_vg).
+        community.general.lvg:
+          vg: longhorn_vg
+          vg_options: "-f"
+          pvs: "{{ item }}" 
+        loop: 
+         - "{{ lvm_pvs_devices | list }}"
+     
+      - name: Create LongHorn Logical Disk (longhorn_vg)
+        community.general.lvol:
+          vg: longhorn_vg
+          lv: lh_Disk1
+          size: 100%FREE
+     
+      - name: format file system
+        community.general.filesystem:
+          fstype: "{{ data_path_fstype }}"
+          dev: /dev/mapper/longhorn_vg-lh_Disk1
+     
+      - name: Create a ext4 filesystem
+        community.general.filesystem:
+         fstype: "{{ data_path_fstype }}"
+         dev: /dev/mapper/longhorn_vg-lh_Disk1
+     
+      - name: create longhorn default dir 
+        ansible.builtin.file:
+          owner : root
+          group:  root
+          path:  "/var/lib/longhorn"
+          state: directory
+     
+      - name: Add Long Horn Mount to fstab
+        ansible.builtin.lineinfile:
+          path: /etc/fstab
+          line: /dev/mapper/longhorn_vg-lh_Disk1 /var/lib/longhorn {{ data_path_fstype }} defaults 0  0
+      
+      - name: mount dirctory 
+        shell:
+          cmd: mount -a
+     when: create_dedicated_lvm_disk == true
+
+   when: inventory_hostname in groups['worker_nodes']

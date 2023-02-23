@@ -1,0 +1,8 @@
+---
+# tasks file for etc-hosts
+
+  -   ansible.builtin.include_tasks: "k8s_internal_subnet.yml"
+      when: use_k8s_network == true
+
+  -   ansible.builtin.include_tasks: "default_net.yml"
+      when: use_k8s_network == false

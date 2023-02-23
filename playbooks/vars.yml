@@ -1,0 +1,27 @@
+ - dockerhub_auth: true/false
+ - dockerhub_token: "docker_auth_token"
+ - bootstrap_only: true/false
+
+
+ - TimeZone: "TimeZone"
+ - use_k8s_network: true/false       
+ - k8s_internal_network: "kubernets propagtion network"
+
+ - k8s_user_admin: "user_to_admin_kubernetes"
+ - k8s_user_pass: "kubernets user password"
+
+ - longhorn_ui_user: "longhorn_admin_panle_user"
+ - longhorn_ui_password: "longhorn_admin_password"
+ - set_network_storage: true/false
+
+ - storage_nic:  "storage_network_NIC_name"   <-- must be the same name on all nodes connected to storage network 
+ - create_dedicated_lvm_disk: true/false
+ - data_path_fstype: "xfs/ext4"
+ - lvm_pvs_devices:         <-- use this list method  if dedicated storage harddisks is the same  on all worker nodes, if not please define dedicatd ddisk   
+       - "/dev/sdb"         <-- device in inventory file E.g   lvm_pvs_devices='["/dev/sdb","/dev/sdc","/dev/sdd"]'
+       - "/dev/sdc"
+       - "/dev/sdd"
+
+ - MetaLB_Pool_Name: "public"
+ - MetaLB_IP_Pool:
+    - "StartIP-EndIP"

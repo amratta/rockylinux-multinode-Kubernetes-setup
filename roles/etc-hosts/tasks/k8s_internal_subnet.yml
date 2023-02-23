@@ -1,0 +1,19 @@
+---
+ - shell:
+      cmd: "ip address show to {{ k8s_internal_network }} | grep inet | sed -e 's/\\/24//g' | awk '{print $2}'"
+   register: Internal_IP
+ 
+ - shell:      
+     cmd:  "{{ item }}"         
+   delegate_to: 127.0.0.1
+   loop:
+     - "echo ''> /tmp/hosts" 
+     - "echo {{ Internal_IP.stdout }} {{ inventory_hostname }} {{ inventory_hostname }}.{{ domain_name }} >> /tmp/hosts"     
+
+ - ansible.builtin.copy:
+     src: /tmp/hosts
+     dest: /tmp/hosts
+     force: yes    
+
+ - shell:
+    cmd: "cat /tmp/hosts >> /etc/hosts"

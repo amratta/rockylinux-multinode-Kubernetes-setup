@@ -1,0 +1,84 @@
+---
+# tasks file for prepare-nodes
+ - name: Set Node HostName
+   ansible.builtin.hostname:
+     name: "{{ inventory_hostname }}"
+
+ - name: Install open-vm-tools for VMWare Guests
+   ansible.builtin.yum:
+     name: "open-vm-tools"
+     state: present
+   when:
+     - ansible_virtualization_type == "VMware"
+     
+ - name: update OS
+   ansible.builtin.yum:
+     name: '*'
+     update_cache: yes
+     state: latest
+
+ - name: Install Required RPMs
+   ansible.builtin.yum:
+     name: "{{ RPMs }}"
+     update_cache: yes
+     state: present
+   vars:
+     RPMs:
+      - epel-release.noarch
+      - bash-completion
+      - yum-utils
+      - chrony.x86_64  
+      - unzip
+      - tar
+      - vim
+      - wget  
+        
+ - name: Set Time Zone Default (UTC)
+   community.general.timezone:
+     name: "{{ TimeZone }}"
+
+ - name: Remove Old NTP Pool
+   ansible.builtin.lineinfile:
+     path: /etc/chrony.conf
+     regexp: '^pool'
+     state: absent
+
+ - name: Add NTP Pool
+   ansible.builtin.lineinfile:
+      path: /etc/chrony.conf
+      line: "server {{ item }}"
+   loop: "{{ NTP_Servers | list }}"
+
+ - name: Start chronyd
+   ansible.builtin.service:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+   loop:
+     - chronyd.service      
+
+ - name: Disable SELinux for  Rocky8
+   ansible.builtin.lineinfile:
+     path: /etc/selinux/config
+     regexp: '^SELINUX='
+     line: SELINUX=disabled
+   when:
+     - ansible_facts['distribution'] == "Rocky"
+     - ansible_facts['distribution_major_version'] == "8"
+
+ - name: Disable SELinux for Rocky9
+   shell:
+     cmd: "grubby --update-kernel ALL --args selinux=0"
+   when:
+     - ansible_facts['distribution'] == "Rocky"
+     - ansible_facts['distribution_major_version'] == "9"
+
+ - name: Stop and Disable Firewalld
+   ansible.builtin.service:
+     name: firewalld
+     state: stopped
+     enabled: no
+
+ - name: Rebooting Servers
+   ansible.builtin.reboot:
+      reboot_timeout: 1800 

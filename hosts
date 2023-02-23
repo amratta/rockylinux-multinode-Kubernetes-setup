@@ -1,0 +1,28 @@
+[all:children]
+control_nodes
+worker_nodes
+
+[control_nodes]
+ControlPlane-01 ansible_host=IP ansible_user=root ansible_ssh_pass='Password' ansible_connection=ssh 
+
+[worker_nodes]
+Node01 ansible_host=IP ansible_user=root ansible_ssh_pass='Password' ansible_connection=ssh  #lvm_pvs_devices='["/dev/sdb","/dev/sdc","/dev/sdd"]'
+Node02 ansible_host=IP ansible_user=root ansible_ssh_pass='Password' ansible_connection=ssh  #lvm_pvs_devices='["/dev/sdb","/dev/sdc","/dev/sdd"]'
+Node03 ansible_host=IP ansible_user=root ansible_ssh_pass='Password' ansible_connection=ssh  #lvm_pvs_devices='["/dev/sdb","/dev/sdc","/dev/sdd"]'
+Node04 ansible_host=IP ansible_user=root ansible_ssh_pass='Password' ansible_connection=ssh  #lvm_pvs_devices='["/dev/sdb","/dev/sdc","/dev/sdd"]'           
+
+
+#[control_nodes:vars]
+#ansible_connection=ssh
+#ansible_user=root
+#ansible_ssh_pass='password'
+#ansible_ssh_private_key_file=/root/.ssh/id_rsa
+#ansible_become=yes
+#ansible_become_user=root
+#ansible_become_method=sudo
+
+
+#[worker_nodes:vars]
+#ansible_connection=ssh
+#ansible_user=root
+#ansible_ssh_pass='password'

@@ -1,0 +1,204 @@
+---
+# tasks file for k8s-preinstall
+ - name: Install Required RPMs
+   ansible.builtin.yum:
+     name: "{{ RPMs }}"
+     state: present
+   vars:
+     RPMs:
+      - python36
+      - python3-pip.noarch
+      - gcc.x86_64
+      - libffi-devel
+      - platform-python-devel
+      - openssl-devel  
+      - git  
+   when: 
+     - inventory_hostname in groups['control_nodes']
+     - ansible_facts['distribution'] == "Rocky"
+     - ansible_facts['distribution_major_version'] == "8"
+
+ - name: Install Required RPMs
+   ansible.builtin.yum:
+     name: "{{ RPMs }}"
+     state: present
+   vars:
+     RPMs:
+      - python3
+      - python3-pip.noarch
+      - gcc.x86_64
+      - libffi-devel 
+      - platform-python-devel
+      - openssl-devel  
+      - git
+   when:
+     - inventory_hostname in groups['control_nodes']
+     - ansible_facts['distribution'] == "Rocky"
+     - ansible_facts['distribution_major_version'] == "9"
+
+ - name: Create Required Files 
+   ansible.builtin.file:
+     path: "{{ item }}"
+     owner: root
+     group: root
+     mode: '0644'
+     state: touch
+   loop:
+     - /etc/modules-load.d/k8s.conf
+     - /etc/sysctl.d/k8s.conf
+     - /etc/profile.d/k8s-cluster.sh  
+
+ - name: Add Kernel Required Modules
+   ansible.builtin.blockinfile:
+     path: /etc/modules-load.d/k8s.conf
+     block: |
+       overlay
+       br_netfilter
+
+ - name: add sysctl configuration
+   ansible.builtin.blockinfile:
+    path: /etc/sysctl.d/k8s.conf
+    block: |
+      net.bridge.bridge-nf-call-iptables = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.ipv4.ip_forward = 1
+
+ - name: set kubectl  configuration to root user
+   ansible.builtin.lineinfile:
+     path: /etc/profile.d/k8s-cluster.sh
+     line: "export KUBECONFIG=/etc/kubernetes/admin.conf"
+
+ - name: remove swap line
+   ansible.builtin.lineinfile:
+     path: /etc/fstab
+     state: absent
+     regexp: '^.*swap.*$'
+
+ - name: Add Docker Repo
+   ansible.builtin.shell:
+     cmd: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+ - name: Get Server Arch 
+   ansible.builtin.shell:
+     cmd: uname -m
+   register: basesearch
+
+ - name: Add Kubernets Repo
+   ansible.builtin.yum_repository:
+    name: kubernetes
+    description: kubernetes Repo
+    file: kubernetes
+    baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-{{ basesearch.stdout }}"
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+    exclude: kubelet kubeadm kubectl
+
+ - name: Install Kubernets Required RPMs
+   ansible.builtin.yum:
+     name: "{{ RPMs }}"
+     state: latest
+     disable_excludes: kubernetes
+   vars:
+     RPMs:
+      - iproute-tc      
+      - containerd.io
+      - kubelet
+      - kubeadm
+      - kubectl
+
+ - name: create containerd config file
+   ansible.builtin.shell:
+      cmd: containerd config default > /etc/containerd/config.toml
+
+ - name: enable contained systemd cgroups
+   ansible.builtin.lineinfile:
+     path:  /etc/containerd/config.toml
+     regexp: '\s{2,}SystemdCgroup = false'
+     line:   "            SystemdCgroup = true"
+
+ - name: remove old registry.configs 
+   ansible.builtin.lineinfile:
+    path:  /etc/containerd/config.toml
+    regexp: '(\s+)\[plugins."io.containerd.grpc.v1.cri".registry.configs\]'
+    state: absent 
+   when: 
+    - dockerhub_auth == true
+
+ - name: Add Docker Registery authentication 
+   ansible.builtin.blockinfile:
+    path: /etc/containerd/config.toml
+    block: |
+      [plugins."io.containerd.grpc.v1.cri".registry.configs]
+        [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ Docker_Registry }}".auth]
+          auth = "{{ dockerhub_token }}"
+   when: 
+    - dockerhub_auth == true
+
+ - name: Start Services
+   ansible.builtin.service:
+     name: "{{ item }}"
+     state: restarted
+     enabled: yes
+   loop:
+     - kubelet
+     - chronyd
+     - containerd   
+
+ - name: Create K8S directoy to collect yaml files for future use  
+   ansible.builtin.file:
+    path: "/k8s-multinodes-yamls"
+    state: directory
+   when:
+     - inventory_hostname in groups['control_nodes']
+
+ - name: Get helm
+   ansible.builtin.unarchive:
+     src: "{{ Helm_URL }}"
+     dest: /tmp
+     remote_src: yes
+   when:
+     - inventory_hostname in groups['control_nodes']
+
+ - name: install helm
+   shell:
+     cmd: "mv /tmp/linux-amd64/helm /usr/local/bin/helm"
+   when:
+     - inventory_hostname in groups['control_nodes']
+
+ - name: Install Rocky8 required python modules for Rocky8
+   ansible.builtin.pip:
+     executable: pip3.6
+     name: "{{ item }}"
+     state: latest
+   loop:
+     - pip     
+     - kubernetes
+     - PyYAML     
+     - jsonpatch 
+     - setuptools-rust
+     - cryptography  
+   when: 
+     - inventory_hostname in groups['control_nodes']
+     - ansible_facts['distribution'] == "Rocky"
+     - ansible_facts['distribution_major_version'] == "8"
+
+ - name: Install Rocky9 required python modules for kubernetes.core.k8s module
+   ansible.builtin.pip:
+     executable: pip3.9
+     name: "{{ item }}"
+     state: latest
+   loop:
+     - kubernetes
+     - PyYAML
+     - jsonpatch
+     - setuptools-rust
+     - cryptography  
+   when:
+     - inventory_hostname in groups['control_nodes']
+     - ansible_facts['distribution'] == "Rocky"
+     - ansible_facts['distribution_major_version'] == "9"
+
+ - name: Rebooting Servers
+   ansible.builtin.reboot:
+      reboot_timeout: 1800

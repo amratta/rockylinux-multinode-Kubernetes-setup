@@ -1,0 +1,118 @@
+---
+###########################################
+#           Deploymnet With SVC           #
+###########################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-deployment
+  namespace: default
+  labels:
+     app: nginx-k8s
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+       app: nginx-k8s
+  template:
+    metadata:
+      labels:
+         app: nginx-k8s
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "I'm a Deployment Pod my IP is $(hostname -i)" > /usr/share/nginx/html/index.html
+          nginx -g "daemon off;"
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-deployment-svc
+  namespace: default
+spec:
+  selector:
+    app: nginx-k8s
+  type: LoadBalancer
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+        
+############################################
+#  Statefulset & Service & headless service#  
+############################################        
+---        
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-verify-statefullset-svc
+  namespace: default
+spec:
+  selector:
+    app: k8s-verify
+  type: LoadBalancer
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nginx-statefulset-verify
+  namespace: default 
+spec:
+  replicas: 3
+  serviceName: k8s-verify-headless-svc
+  selector:
+    matchLabels:
+      app: k8s-verify
+  template:
+    metadata:
+      labels:
+        app: k8s-verify
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-data
+          mountPath: /usr/share/nginx/html
+        command: 
+        - /bin/sh
+        - -c
+        - |
+          echo "I'm a StatefullSet pod my IP is $(hostname -i)" > /usr/share/nginx/html/index.html
+          nginx -g "daemon off;"
+  volumeClaimTemplates:
+  - metadata:
+      name: nginx-data
+    spec:
+      accessModes: ["ReadWriteOnce"] 
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-verify-headless-svc
+  namespace: default
+spec:
+  selector:
+    app: k8s-verify
+  clusterIP: None
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80

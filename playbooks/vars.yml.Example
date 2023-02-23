@@ -1,0 +1,28 @@
+---
+ - dockerhub_auth: true          
+ - dockerhub_token: "abdfpwertgwdfgxcvadsrgagdfgafdsgasdfgasdfgasdfgasdffsfddsffgfd=="  #Fake token please change  
+ - bootstrap_only: true
+
+ - Pods_CIDR: "10.10.0.0/16"
+ - TimeZone: "Africa/Cairo"                            
+ - use_k8s_network: true                                                       
+ - k8s_internal_network: "172.20.20.0/24"               
+
+ - k8s_user_admin: "admin"                             
+ - k8s_user_pass: "password@123"                            
+
+ - longhorn_ui_user: "admin"
+ - longhorn_ui_password: "longhorn123"  
+ - set_network_storage: true                        
+
+ - storage_nic:  "ens224" 
+ - create_dedicated_lvm_disk: true 
+ - data_path_fstype: "ext4"
+
+# - lvm_pvs_devices: 
+#       - "/dev/sdd"
+#       - "/dev/sdb"
+#       - "/dev/sdv"                          
+ 
+ - MetaLB_IP_Pool:                                             
+    - "192.168.1.200-192.168.1.250"

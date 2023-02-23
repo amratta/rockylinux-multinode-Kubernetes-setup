@@ -1,0 +1,9 @@
+---
+# defaults file for longhorn
+create_dedicated_lvm_disk: false
+lvm_pvs_devices: "/dev/sdxx"
+data_path_fstype: "ext4"
+set_network_storage: false
+storage_nic: "eth3"
+longhorn_ui_user: "admin"
+longhorn_ui_password: "Password@k8s"
