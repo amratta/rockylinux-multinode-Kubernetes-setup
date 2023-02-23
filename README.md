@@ -22,7 +22,7 @@ At minimum 3 nodes with kubernetes and longhorn minimum requirements
  
  ## Quick Start
  you can see example for quick startup [example](https://github.com/amratta/rockylinux-multinode-k8s-setup#example)
-
+ [example video](https://www.youtube.com/watch?v=tDvwGp0CRQs) 
 ## Ansible Setup & Configuration 
 ansible core installed rocky linux 8.x  
 use the following commands as root
