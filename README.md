@@ -148,6 +148,7 @@ kubectl get deployments
 kubectl get sts
 kubectl get pvc
 kubectl get svc
+kubectl get ingress
 ```
 point your browser into  svc  loadbalancer type IPs you will get these messages 
 
