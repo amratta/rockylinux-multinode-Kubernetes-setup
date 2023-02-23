@@ -222,7 +222,7 @@ Cluster resources URL
 
 
 ## Example 
-All nodes will be Rocky8.x playbook also tested for Rocky Linux 9.x and work fine 
+All nodes with fresh installed  Rocky8.x, Playbook also tested for Rocky Linux 9.x and work fine 
 ### Cluster Layout 
 ![Alt text](./Cluster-Example.png "Cluster Layout")
 ### Network 
