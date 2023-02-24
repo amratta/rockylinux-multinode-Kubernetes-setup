@@ -321,6 +321,13 @@ kubectl get svc
 ```
 ![Alt text](./k8s_nodes.png "Cluster_nodes")
 
+Point your browser into External IPs, from command kubectl get svc output in our case will be 192.168.1.201,192.168.1.202
+you will get 
+```ini
+For statefullset you will get ->  get I'm a StatefullSet pod my IP is IP
+For deployment   you will get -> get I'm a Deployment Pod my IP is 
+```
+
 ### Access Longhorn Admin panel 
 ```
 kubectl get -n longhorn-system ingress
@@ -330,29 +337,7 @@ you will get IP, Refer to this IP and provide theuser name and password defined 
 * password: longhorn123
 ![Alt text](./Longhorn.png "Longhorn_UI")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### Cluster variables 
-
-
 variables defined in vars.yml as a separate file.
 Playbook with roles have alot of variables but in general you need to define the following vars to met your layout and cluster setup 
 
