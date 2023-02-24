@@ -346,7 +346,7 @@ Playbook with roles have alot of variables but in general you need to define the
 |     Name  |   Type |  Values | Description |
 | --------- | ------ | ---------- | ------------ |
 | dockerhub_auth | Boolean | true/false  | Default: false authenticate to docker hub default false, Please check docker pull limits |
-| dockerhub_token | String | "AuthToken" | Docker hub auth token please refer to docker site |
+| dockerhub_token | String | "AuthToken" | Docker hub auth token please refer to docker site, after login to docker usign docker login command token will be in file $HOME/.docker/config.json |
 | bootstrap_only | Boolean |  true/false | Default: false use authentication during cluster installation only, if true and docker_atuh is true docker token will be removed from containred after installation |   
 
 
