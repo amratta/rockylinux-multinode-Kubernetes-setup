@@ -323,7 +323,7 @@ kubectl get svc
 
 ### Access Longhorn Admin panel 
 ```
-kubectl get ingress
+kubectl get -n longhorn-system ingress
 ```
 you will get IP, Refer to this IP and provide theuser name and password defined in vars.yml file 
 * user: longhorn
