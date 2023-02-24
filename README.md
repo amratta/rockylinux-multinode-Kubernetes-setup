@@ -1,5 +1,5 @@
 # k8s-cluster-setup.yml
-This playbook will install multinode kubernete cluster, one control-plane node and multi worker nodes with helm,longhorn,multus,and MetaLB on RockyLinux (8.x,9.x) 
+This playbook will install multinode kubernete cluster, one control-plane node and multi worker nodes with containerd, helm, longhorn, multus,and MetalLB on RockyLinux (8.x,9.x) 
 Recommended Rocky Linux 8.x 
 
  Please refer to the minimum requirements before beginning.
