@@ -384,6 +384,8 @@ kubectl get deployments
 kubectl get sts 
 kubectl get svc
 ```
+![Alt text](./k8s_nodes.png "Cluster_nodes")
+
 ### Access Longhorn Admin panel 
 ```
 kubectl get ingress
@@ -391,5 +393,6 @@ kubectl get ingress
 you will get IP, Refer to this IP and provide theuser name and password defined in vars.yml file 
 * user: longhorn
 * password: longhorn123
+![Alt text](./Longhorn.png "Longhorn_UI")
 
 
