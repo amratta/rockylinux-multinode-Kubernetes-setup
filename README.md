@@ -152,7 +152,7 @@ kubectl get pvc
 kubectl get svc
 kubectl get ingress
 ```
-point your browser into  svc  loadbalancer type IPs you will get these messages 
+point your browser into  svc  loadbalancer External IPs, you will get these messages 
 
 ```ini
 For statefullset you will get ->  get I'm a StatefullSet pod my IP is IP
