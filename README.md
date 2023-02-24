@@ -158,71 +158,6 @@ point your browser into  svc  loadbalancer type IPs you will get these messages
 For statefullset you will get ->  get I'm a StatefullSet pod my IP is IP
 For deployment   you will get -> get I'm a Deployment Pod my IP is 
 ```
-
-
-### Cluster variables 
-
-
-variables defined in vars.yml as a separate file.
-Playbook with roles have alot of variables but in general you need to define the following vars to met your layout and cluster setup 
-
-#### Dcoker Authentication Config Variables
-
-|     Name  |   Type |  Values | Description |
-| --------- | ------ | ---------- | ------------ |
-| dockerhub_auth | Boolean | true/false  | Default: false authenticate to docker hub default false, Please check docker pull limits |
-| dockerhub_token | String | "AuthToken" | Docker hub auth token please refer to docker site |
-| bootstrap_only | Boolean |  true/false | Default: false use authentication during cluster installation only, if true and docker_atuh is true docker token will be removed from containred after installation |   
-
-
-#### Kubernets Cluster Config Variables
-
-| Name            |   Type  |      value     | Default/Description |
-| -------------   | ------- | -------------- | ------------------- |
-| k8s_user_admin  | String  | "admin" | Default: "admin" Kubernetes administrator username will be created on control-plane node default: admin | 
-| k8s_user_pass   | String  | "Password" | Default: "Password" Kubernetes administrator password default: Password |
-| use_k8s_network | Boolean |  true/false | Default: false  Use dedicated network for kubernetes service communication if set to false kubernetes  will use default  gateway network |
-|k8s_internal_network| String | "network/cidr" | Default: "172.31.255.0/24" ,Kubernetes service dedicated network effective if  use_k8s_network is true |
-| Pods_CIDR" | String | "10.10.0.0/16" | Default: "10.10.0.0/16" ,Pods Network CID |
-|  domain_name | String | "k8s.local" | Default: "k8s.local"  , used in setting nodes hostnames,/etc/hosts and creating DNS records for pods and Services please refer to kubernets docs | 
-|set_k8s_service_domain | Boolean | true/false | Default: false   ,If set to true kubernetes Pods and Services DNS records will be created with the domain defined in domain_name variable | 
-| MetaLB_Pool_Name | String | "public" | default: "public"  MetaLB LoadBalancer IP Pool name  
-| MetaLB_IP_Pool | List of Strings | "192.168.1.l00-192.168.1.250" | No default. public ip address you can reach from your PC for more info  refer to MetaLB web site |
-
-#### Longhorn Config Variables 
-
-| Name |   Type   |  value/default | Default/Description |
-| --------- | -------- | -------------- | -------------- |
-| set_network_storage | Boolean | true/false | If you need dedicated network for storage communication set it to true |                      |  
-| storage_nic | String | "eth3" | Deafult: eth3  Network interface card connected to dedicated storage network must be the same on all nodes | 
-| create_dedicated_lvm_disk | Boolean | false | Default: false Let ansible to create dedicated storage disks in lvm volume  please see longhorn best practice  |
-| lvm_pvs_devices | list of strings | ["/dev/sdxx","/dev/sdyy"] | no default. List of physical disks to use in lvm you can specify it per host in ansible inventory file,,,  Effective when create_dedicated_lvm_disk: true | 
-|data_path_fstype | String | "xfs/ext4" | Deafult: ext4 Dedicated storage disk format,,, Effective when create_dedicated_lvm_disk: true |  
-| longhorn_ui_user | String | "admin" | Default: admin longhron web inetrafce username |
-|longhorn_ui_password| String | "Password" | Default: Password, longhorn web inetrafce user password |
-
-
-#### System Values 
-|      Name           |   Type   |  value/default | Default/Description |
-| ------------------  | -------- | -------------- | -------------------- |
-|   TimeZone          |  String  |      "UTC"     | Default: "UTC", TimeZone |
-|   NTP_Servers       |  String  | List of String | Default: ["0.pool.ntp.org","1.pool.ntp.org","2.pool.ntp.org","3.pool.ntp.org"] , NTP Servers List |    
-
-
-#### Default URLs and System Values 
-Cluster resources URL 
-| Name                  |  Values                                                                                                       |
-| --------------------- | ---------------------------------------------------------------------------------------------------|
-| Calico_Tigera_URL     | "https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml"    |            
-| Calico_Custom_Res_URL | "https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/custom-resources.yaml"   |
-| MetaLB_URL            | "https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml"   | 
-| Longhorn_URL          | "https://raw.githubusercontent.com/longhorn/longhorn/v1.4.0/deploy/longhorn.yaml"                  |
-| Multus_URL            | "https://github.com/k8snetworkplumbingwg/multus-cni.git"                                           |
-| Helm_URL              | "https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz"                                              |
-| Nginx_Ingress_URL     | "https://kubernetes.github.io/ingress-nginx"                                                       |
-| Docker_Registry:      | "registry-1.docker.io"                                                                             | 
-
-
 ## Example 
 All nodes with fresh installed  Rocky8.x, Playbook also tested for Rocky Linux 9.x and work fine 
 ### Cluster Layout 
@@ -394,5 +329,87 @@ you will get IP, Refer to this IP and provide theuser name and password defined 
 * user: longhorn
 * password: longhorn123
 ![Alt text](./Longhorn.png "Longhorn_UI")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Cluster variables 
+
+
+variables defined in vars.yml as a separate file.
+Playbook with roles have alot of variables but in general you need to define the following vars to met your layout and cluster setup 
+
+#### Dcoker Authentication Config Variables
+
+|     Name  |   Type |  Values | Description |
+| --------- | ------ | ---------- | ------------ |
+| dockerhub_auth | Boolean | true/false  | Default: false authenticate to docker hub default false, Please check docker pull limits |
+| dockerhub_token | String | "AuthToken" | Docker hub auth token please refer to docker site |
+| bootstrap_only | Boolean |  true/false | Default: false use authentication during cluster installation only, if true and docker_atuh is true docker token will be removed from containred after installation |   
+
+
+#### Kubernets Cluster Config Variables
+
+| Name            |   Type  |      value     | Default/Description |
+| -------------   | ------- | -------------- | ------------------- |
+| k8s_user_admin  | String  | "admin" | Default: "admin" Kubernetes administrator username will be created on control-plane node default: admin | 
+| k8s_user_pass   | String  | "Password" | Default: "Password" Kubernetes administrator password default: Password |
+| use_k8s_network | Boolean |  true/false | Default: false  Use dedicated network for kubernetes service communication if set to false kubernetes  will use default  gateway network |
+|k8s_internal_network| String | "network/cidr" | Default: "172.31.255.0/24" ,Kubernetes service dedicated network effective if  use_k8s_network is true |
+| Pods_CIDR" | String | "10.10.0.0/16" | Default: "10.10.0.0/16" ,Pods Network CID |
+|  domain_name | String | "k8s.local" | Default: "k8s.local"  , used in setting nodes hostnames,/etc/hosts and creating DNS records for pods and Services please refer to kubernets docs | 
+|set_k8s_service_domain | Boolean | true/false | Default: false   ,If set to true kubernetes Pods and Services DNS records will be created with the domain defined in domain_name variable | 
+| MetaLB_Pool_Name | String | "public" | default: "public"  MetaLB LoadBalancer IP Pool name  
+| MetaLB_IP_Pool | List of Strings | "192.168.1.l00-192.168.1.250" | No default. public ip address you can reach from your PC for more info  refer to MetaLB web site |
+
+#### Longhorn Config Variables 
+
+| Name |   Type   |  value/default | Default/Description |
+| --------- | -------- | -------------- | -------------- |
+| set_network_storage | Boolean | true/false | If you need dedicated network for storage communication set it to true |                      |  
+| storage_nic | String | "eth3" | Deafult: eth3  Network interface card connected to dedicated storage network must be the same on all nodes | 
+| create_dedicated_lvm_disk | Boolean | false | Default: false Let ansible to create dedicated storage disks in lvm volume  please see longhorn best practice  |
+| lvm_pvs_devices | list of strings | ["/dev/sdxx","/dev/sdyy"] | no default. List of physical disks to use in lvm you can specify it per host in ansible inventory file,,,  Effective when create_dedicated_lvm_disk: true | 
+|data_path_fstype | String | "xfs/ext4" | Deafult: ext4 Dedicated storage disk format,,, Effective when create_dedicated_lvm_disk: true |  
+| longhorn_ui_user | String | "admin" | Default: admin longhron web inetrafce username |
+|longhorn_ui_password| String | "Password" | Default: Password, longhorn web inetrafce user password |
+
+
+#### System Values 
+|      Name           |   Type   |  value/default | Default/Description |
+| ------------------  | -------- | -------------- | -------------------- |
+|   TimeZone          |  String  |      "UTC"     | Default: "UTC", TimeZone |
+|   NTP_Servers       |  String  | List of String | Default: ["0.pool.ntp.org","1.pool.ntp.org","2.pool.ntp.org","3.pool.ntp.org"] , NTP Servers List |    
+
+
+#### Default URLs and System Values 
+Cluster resources URL 
+| Name                  |  Values                                                                                                       |
+| --------------------- | ---------------------------------------------------------------------------------------------------|
+| Calico_Tigera_URL     | "https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml"    |            
+| Calico_Custom_Res_URL | "https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/custom-resources.yaml"   |
+| MetaLB_URL            | "https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml"   | 
+| Longhorn_URL          | "https://raw.githubusercontent.com/longhorn/longhorn/v1.4.0/deploy/longhorn.yaml"                  |
+| Multus_URL            | "https://github.com/k8snetworkplumbingwg/multus-cni.git"                                           |
+| Helm_URL              | "https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz"                                              |
+| Nginx_Ingress_URL     | "https://kubernetes.github.io/ingress-nginx"                                                       |
+| Docker_Registry:      | "registry-1.docker.io"                                                                             | 
 
 
