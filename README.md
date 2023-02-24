@@ -12,7 +12,7 @@ https://longhorn.io/docs/1.4.0/best-practices/
 ## Cluster Nodes Requrements (Best Practice)
 At minimum 3 nodes with kubernetes and longhorn minimum requirements
 - Root Access 
-- Full internet access 
+- Internet access 
 - A dedicated network for internal kubernetes communication (kubernetes propagation network) is highly recommended for best practice.    
 - A dedicated network for longhorn block storage  is highly recommended if not set longhorn storage will use the same kubernets network.
     * The NIC name attached to the storage network must be with the same name on all nodes.   
