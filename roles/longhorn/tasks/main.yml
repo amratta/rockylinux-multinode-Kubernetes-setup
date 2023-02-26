@@ -46,7 +46,11 @@
         shell:
           cmd: "dd if=/dev/zero of={{ item }} bs=1M count=1"
         loop: "{{ lvm_pvs_devices |  list }}"
-     
+
+      - name: Rebooting Worker Nodes
+        ansible.builtin.reboot:
+          reboot_timeout: 1800
+
       - name: Create LongHorn Volume Group (longhorn_vg).
         community.general.lvg:
           vg: longhorn_vg
