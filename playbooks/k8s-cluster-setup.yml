@@ -9,8 +9,8 @@
      roles:
        - etc-hosts       
        - prepare-nodes 
-       - k8s-preinstall
-       - longhorn  
+       - longhorn 
+       - k8s-preinstall        
      vars_files:
        - vars.yml   
      tasks:
