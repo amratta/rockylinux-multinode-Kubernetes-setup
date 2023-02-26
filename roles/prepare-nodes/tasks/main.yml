@@ -78,7 +78,3 @@
      name: firewalld
      state: stopped
      enabled: no
-
- - name: Rebooting Servers
-   ansible.builtin.reboot:
-      reboot_timeout: 1800 
