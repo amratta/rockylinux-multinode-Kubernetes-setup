@@ -204,23 +204,23 @@
 
                - kubernetes.core.k8s:
                    state: present
-                   src: "{{ item }}"
+                   src: "/tmp/storage-network.yml"
                    kubeconfig: "/etc/kubernetes/admin.conf"
                    wait_timeout: 3600
                    wait: yes
-                 loop:
-                   - "/tmp/storage-network.yml"
-                   - "/k8s-multinodes-yamls/longhorn-ingress.yml"  
              when:
                 - set_network_storage     
 
-           - name: Apply longhorn and verify installation yamls
+           - name: Ingress and verify installation yamls
              kubernetes.core.k8s:
                 state: present
-                src: "/k8s-multinodes-yamls/verify.yml"
+                src: "{{ item }}"
                 kubeconfig: "/etc/kubernetes/admin.conf"
                 wait_timeout: 3600
                 wait: yes
+             loop:
+               - "/k8s-multinodes-yamls/longhorn-ingress.yml"
+               - "/k8s-multinodes-yamls/verify.yml"
 
            - name: Enable kubernets auto-completion  
              shell:
