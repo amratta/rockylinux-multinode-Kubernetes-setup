@@ -10,7 +10,7 @@ https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-ku
 https://longhorn.io/docs/1.4.0/best-practices/
 ```
 ## Cluster Nodes Requrements (Best Practice)
-At minimum 3 nodes with kubernetes and longhorn minimum requirements
+- One control plane node, At least 3 worker nodes ( to get longhorn disks in healthy state 3 worker nodes is required ) with Kubernetes and longhorn minimum requirements
 - Root Access 
 - Internet access 
 - A dedicated network for internal kubernetes communication (kubernetes propagation network) is highly recommended for best practice.    
