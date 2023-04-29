@@ -259,15 +259,6 @@
               path: "{{ Default_Home_Path }}/{{ k8s_user_admin }}/.bashrc"
               line: "export KUBECONFIG=~/.kube/config"
                
-           - name: add RBAC Rolebindings for root,adminuser ( Required for helm )
-             shell:
-               cmd: "{{ item }}"
-             environment:
-                  - KUBECONFIG: /etc/kubernetes/admin.conf
-             loop:
-               - kubectl create clusterrolebinding root-clusteradmin --clusterrole cluster-admin --user root
-               - kubectl create clusterrolebinding user-admin --clusterrole admin --user {{ k8s_user_admin }}
-               
          when: inventory_hostname in groups['control_nodes']
 
        - name: Remove Docker Authtoken
