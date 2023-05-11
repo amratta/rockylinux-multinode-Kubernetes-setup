@@ -6,35 +6,12 @@
      state: present
    vars:
      RPMs:
-      - python36
-      - python3-pip.noarch
-      - gcc.x86_64
-      - libffi-devel
-      - platform-python-devel
+      - python3-cryptography
+      - python3-pyyaml      
       - openssl-devel  
       - git  
    when: 
      - inventory_hostname in groups['control_nodes']
-     - ansible_facts['distribution'] == "Rocky"
-     - ansible_facts['distribution_major_version'] == "8"
-
- - name: Install Required RPMs
-   ansible.builtin.yum:
-     name: "{{ RPMs }}"
-     state: present
-   vars:
-     RPMs:
-      - python3
-      - python3-pip.noarch
-      - gcc.x86_64
-      - libffi-devel 
-      - platform-python-devel
-      - openssl-devel  
-      - git
-   when:
-     - inventory_hostname in groups['control_nodes']
-     - ansible_facts['distribution'] == "Rocky"
-     - ansible_facts['distribution_major_version'] == "9"
 
  - name: Create Required Files 
    ansible.builtin.file:
@@ -165,39 +142,6 @@
      cmd: "mv /tmp/linux-amd64/helm /usr/local/bin/helm"
    when:
      - inventory_hostname in groups['control_nodes']
-
- - name: Install Rocky8 required python modules for Rocky8
-   ansible.builtin.pip:
-     executable: pip3.6
-     name: "{{ item }}"
-     state: latest
-   loop:
-     - pip     
-     - kubernetes
-     - PyYAML     
-     - jsonpatch 
-     - setuptools-rust
-     - cryptography  
-   when: 
-     - inventory_hostname in groups['control_nodes']
-     - ansible_facts['distribution'] == "Rocky"
-     - ansible_facts['distribution_major_version'] == "8"
-
- - name: Install Rocky9 required python modules for kubernetes.core.k8s module
-   ansible.builtin.pip:
-     executable: pip3.9
-     name: "{{ item }}"
-     state: latest
-   loop:
-     - kubernetes
-     - PyYAML
-     - jsonpatch
-     - setuptools-rust
-     - cryptography  
-   when:
-     - inventory_hostname in groups['control_nodes']
-     - ansible_facts['distribution'] == "Rocky"
-     - ansible_facts['distribution_major_version'] == "9"
 
  - name: Rebooting Servers
    ansible.builtin.reboot:
