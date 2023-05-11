@@ -70,7 +70,6 @@
                 dest: "{{ item.dest }}"
               loop:
                 - { src: '{{ Calico_Custom_Res_URL }} ', dest: "/k8s-multinodes-yamls/custom-resources.yml" }
-                - { src: '{{ Calico_Tigera_URL }}', dest: "/k8s-multinodes-yamls/tigera-operator.yml" }
                 - { src: '{{ MetaLB_URL }}' , dest: "/k8s-multinodes-yamls/metallb-native.yml" }
 
             - name: edit pods CIDR for Calico Tigera
@@ -80,16 +79,18 @@
                 line: '      cidr: {{ Pods_CIDR }}'
               when: Pods_CIDR != "192.168.0.0/16"   
 
-            - name: Apply Calico Tigera network module 
-              kubernetes.core.k8s:
-                state: present
-                src: "{{ item }}"
-                kubeconfig: "/etc/kubernetes/admin.conf"
-                wait: yes
-                wait_timeout: 3600
+
+            - name: Apply Calico Tigera network module
+              shell:
+                cmd: "{{ item }}"
+              environment:
+                - KUBECONFIG: /etc/kubernetes/admin.conf
+              async: 3600
+              poll: 10
               loop:
-                - "/k8s-multinodes-yamls/tigera-operator.yml"
-                - "/k8s-multinodes-yamls/custom-resources.yml"  
+                - kubectl create -f "{{ Calico_Tigera_URL }}" 
+                - kubectl apply -f /k8s-multinodes-yamls/custom-resources.yml
+                - kubectl wait --for=condition=Ready pod --all=true --all-namespaces=true --timeout 60m
 
             - name: Get Join command    
               shell:
@@ -134,17 +135,19 @@
                    dest: /tmp/multus-cni
        
                - name: Install Muluts & MetaLB
-                 kubernetes.core.k8s:
-                    state: present
-                    src: "{{ item }}"
-                    kubeconfig: "/etc/kubernetes/admin.conf"
-                    wait_timeout: 3600
-                    wait: yes
+                 shell:
+                   cmd: "{{ item }}"
+                 environment:
+                   - KUBECONFIG: /etc/kubernetes/admin.conf
+                 async: 3600
+                 poll: 10
                  loop:
-                   - "/k8s-multinodes-yamls/metallb-native.yml"
-                   - "/k8s-multinodes-yamls/MetaLB-IP-Pool.yml"
-                   - "/tmp/multus-cni/deployments/multus-daemonset-thick.yml"
-                   - "/k8s-multinodes-yamls/muluts.yml"
+                   - kubectl apply -f /k8s-multinodes-yamls/metallb-native.yml
+                   - kubectl wait --for=condition=Ready pod --all=true --namespace metallb-system --timeout 60m  
+                   - kubectl apply -f /k8s-multinodes-yamls/MetaLB-IP-Pool.yml
+                   - kubectl apply -f /tmp/multus-cni/deployments/multus-daemonset-thick.yml 
+                   - kubectl apply -f /k8s-multinodes-yamls/muluts.yml 
+                   - kubectl wait --for=condition=Ready pod --all=true --all-namespaces=true --timeout 60m  
 
            - name: Install Nginx Ingress Controller 
              block: 
@@ -199,25 +202,25 @@
                     regexp: '^value:*'
                     line: "value: kube-system/longhorn-sn"
 
-               - kubernetes.core.k8s:
-                   state: present
-                   src: "/tmp/storage-network.yml"
-                   kubeconfig: "/etc/kubernetes/admin.conf"
-                   wait_timeout: 3600
-                   wait: yes
+               - shell:
+                   cmd: kubectl apply -f /tmp/storage-network.yml
+                 environment:
+                  - KUBECONFIG: /etc/kubernetes/admin.conf
+                 async: 3600
+                 poll: 10
              when:
                 - set_network_storage     
 
            - name: Ingress and verify installation yamls
-             kubernetes.core.k8s:
-                state: present
-                src: "{{ item }}"
-                kubeconfig: "/etc/kubernetes/admin.conf"
-                wait_timeout: 3600
-                wait: yes
+             shell:
+               cmd: "{{ item }}"
+             environment:
+               - KUBECONFIG: /etc/kubernetes/admin.conf
+             async: 3600
+             poll: 10
              loop:
-               - "/k8s-multinodes-yamls/longhorn-ingress.yml"
-               - "/k8s-multinodes-yamls/verify.yml"
+               - kubectl apply -f /k8s-multinodes-yamls/longhorn-ingress.yml
+               - kubectl apply -f /k8s-multinodes-yamls/verify.yml
 
            - name: Enable kubernets & Helm auto-completion  
              shell:
