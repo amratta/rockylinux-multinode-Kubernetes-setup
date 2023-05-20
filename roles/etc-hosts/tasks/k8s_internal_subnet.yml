@@ -1,6 +1,10 @@
 ---
  - shell:
-      cmd: "ip address show to {{ k8s_internal_network }} | grep inet | sed -e 's/\\/24//g' | awk '{print $2}'"
+      cmd: "ip address show to {{ k8s_internal_network }} | grep inet  | awk -F' ' '{ print $2 }' | xargs ipcalc -p | awk -F'=' '{ print $2 }'"
+   register: Prefix
+
+ - shell:
+      cmd: "ip address show to {{ k8s_internal_network }} | grep inet | sed -e 's/\\/{{ Prefix.stdout }}//g' | awk '{print $2}'"
    register: Internal_IP
  
  - shell:      

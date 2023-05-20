@@ -1,8 +1,13 @@
 ---
 # tasks file for etc-hosts
+ - name: Install Required RPMs
+   ansible.builtin.yum:
+     name: "ipcalc"
+     update_cache: yes
+     state: present
 
-  -   ansible.builtin.include_tasks: "k8s_internal_subnet.yml"
-      when: use_k8s_network == true
+ - ansible.builtin.include_tasks: "k8s_internal_subnet.yml"
+   when: use_k8s_network == true
 
-  -   ansible.builtin.include_tasks: "default_net.yml"
-      when: use_k8s_network == false
+ - ansible.builtin.include_tasks: "default_net.yml"
+   when: use_k8s_network == false
