@@ -7,7 +7,7 @@ Recommended Rocky Linux 8.x
 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
 ```
 ```ini
-https://longhorn.io/docs/1.4.0/best-practices/
+https://longhorn.io/docs/1.4.2/best-practices/
 ```
 ## Cluster Nodes Requrements (Best Practice)
 - One control plane node, At least 3 worker nodes ( to get longhorn disks in healthy state 3 worker nodes is required ) with Kubernetes and longhorn minimum requirements
@@ -16,7 +16,7 @@ https://longhorn.io/docs/1.4.0/best-practices/
 - A dedicated network for internal kubernetes communication (kubernetes propagation network) is highly recommended for best practice.    
 - A dedicated network for longhorn block storage  is highly recommended if not set longhorn storage will use the same kubernets network.
     * The NIC name attached to the storage network must be with the same name on all nodes.   
-- A dedicated disk for Longhorn storage , instead of using the root disk. [Longhorn best practices](https://longhorn.io/docs/1.4.0/best-practices/)
+- A dedicated disk for Longhorn storage , instead of using the root disk. [Longhorn best practices](https://longhorn.io/docs/1.4.2/best-practices/)
    * Blcok devices Ex(/dev/sdb, /dev/sdd,/dev/sdc ) will be used to create lvm volume and mount it to /var/lib/longhorn if set_network_storage: true
     
  
@@ -391,7 +391,7 @@ Cluster resources URL
 | Calico_Tigera_URL     | "https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/tigera-operator.yaml"           |            
 | Calico_Custom_Res_URL | "https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/custom-resources.yaml"          |
 | MetaLB_URL            | "https://raw.githubusercontent.com/metallb/metallb/v0.13.9/config/manifests/metallb-native.yaml"          | 
-| Longhorn_URL          | "https://raw.githubusercontent.com/longhorn/longhorn/v1.4.1/deploy/longhorn.yaml"                         |
+| Longhorn_URL          | "https://raw.githubusercontent.com/longhorn/longhorn/v1.4.2/deploy/longhorn.yaml"                         |
 | LonghornRWX_URL       | "https://raw.githubusercontent.com/longhorn/longhorn/master/examples/rwx/storageclass-migratable.yaml"    |
 | Multus_URL            | "https://github.com/k8snetworkplumbingwg/multus-cni.git"                                                  |
 | Helm_URL              | "https://get.helm.sh/helm-v3.11.3-linux-amd64.tar.gz"                                                     |
