@@ -16,7 +16,7 @@ https://longhorn.io/docs/1.4.2/best-practices/
 - A dedicated network for internal kubernetes communication (kubernetes propagation network) is highly recommended for best practice.    
 - A dedicated network for longhorn block storage  is highly recommended if not set longhorn storage will use the same kubernets network.
     * The NIC name attached to the storage network must be with the same name on all nodes.   
-- A dedicated disk for Longhorn storage , instead of using the root disk. [Longhorn best practices](https://longhorn.io/docs/1.4.0/best-practices/)
+- A dedicated disk for Longhorn storage , instead of using the root disk. [Longhorn best practices](https://longhorn.io/docs/1.4.2/best-practices/)
    * Blcok devices Ex(/dev/sdb, /dev/sdd,/dev/sdc ) will be used to create lvm volume and mount it to /var/lib/longhorn if set_network_storage: true
     
  
