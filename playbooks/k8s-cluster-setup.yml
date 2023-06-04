@@ -1,9 +1,8 @@
-##############################################################################
-#Importnatant_Note                                                           #
-#            - Don't chnage groups names in ansible inventory file           #
-#            - leave hosts: all (don't change)                               #
-#                                                                            #  
-##############################################################################
+#################################################################################
+#Importnatant_Notes:                                                            #
+#            - Don't change the names of groups in the ansible inventory file.  #
+#            - leave hosts: all (don't change)                                  #
+#################################################################################
 
    - hosts: all      
      roles:
