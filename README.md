@@ -7,7 +7,7 @@ Recommended Rocky Linux 8.x
 https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
 ```
 ```ini
-https://longhorn.io/docs/1.4.2/best-practices/
+https://longhorn.io/docs/latest/best-practices/
 ```
 ## Cluster Nodes Requrements (Best Practice)
 - One control plane node, At least 3 worker nodes ( to get longhorn disks in healthy state 3 worker nodes is required ) with Kubernetes and longhorn minimum requirements
