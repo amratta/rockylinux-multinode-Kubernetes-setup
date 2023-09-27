@@ -63,21 +63,16 @@
    ansible.builtin.shell:
      cmd: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
- - name: Get Server Arch 
-   ansible.builtin.shell:
-     cmd: uname -m
-   register: basesearch
-
  - name: Add Kubernets Repo
    ansible.builtin.yum_repository:
-    name: kubernetes
-    description: kubernetes Repo
-    file: kubernetes
-    baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-{{ basesearch.stdout }}"
-    enabled: yes
-    gpgcheck: yes
-    gpgkey: https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-    exclude: kubelet kubeadm kubectl
+     name: kubernetes
+     description: kubernetes Repo
+     file: kubernetes
+     baseurl: "https://pkgs.k8s.io/core:/stable:/v{{ k8s_version }}/rpm/"
+     enabled: yes
+     gpgcheck: yes
+     gpgkey: "https://pkgs.k8s.io/core:/stable:/v{{ k8s_version }}/rpm/repodata/repomd.xml.key"
+     exclude: kubelet kubeadm kubectl cri-tools kubernetes-cni
 
  - name: Install Kubernets Required RPMs
    ansible.builtin.yum:

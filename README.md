@@ -354,6 +354,7 @@ Playbook with roles have alot of variables but in general you need to define the
 
 | Name            |   Type  |      value     | Default/Description |
 | -------------   | ------- | -------------- | ------------------- |
+|  k8s_version    | String  |    "1.28"      |   Default: "1.28" Kubernets Release version eg: 1.28,1.27... 1.26 etc |
 | k8s_user_admin  | String  | "admin" | Default: "admin" Kubernetes administrator username will be created on control-plane node default: admin | 
 | k8s_user_pass   | String  | "Password" | Default: "Password" Kubernetes administrator password default: Password |
 | use_k8s_network | Boolean |  true/false | Default: false  Use dedicated network for kubernetes service communication if set to false kubernetes  will use default  gateway network |
