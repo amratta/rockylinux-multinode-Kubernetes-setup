@@ -233,15 +233,6 @@
                - "helm completion bash > /etc/bash_completion.d/helm"
              environment:
                - KUBECONFIG: /etc/kubernetes/admin.conf
-                
-           - name: Add cluster_admin user  
-             ansible.builtin.user:
-               name: "{{ k8s_user_admin }}"
-               password: "{{ k8s_user_pass | password_hash('sha512') }}"
-               shell: /bin/bash
-               home: "{{ Default_Home_Path }}/{{ k8s_user_admin }}"
-               comment: user will manage kubernets
-               update_password: on_create
 
            - name: confgure kubectl for admin user
              ansible.builtin.file:
