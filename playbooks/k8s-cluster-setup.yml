@@ -23,10 +23,14 @@
                 cmd: "ip address show to {{ k8s_internal_network }} | grep inet | sed -e 's/\\/{{ Prefix.stdout }}//g' | awk '{print $2}'"
               register: ControlPlane_Internal_IP
                  
+            - shell:
+                cmd: python3 -c "from passlib.hash import sha512_crypt; import getpass; print (sha512_crypt.encrypt( '{{ k8s_user_pass }}' ))"
+              register: Pass_Hash
+
             - name: Add cluster admin user in controlplane node
               ansible.builtin.user:
                 name: "{{ k8s_user_admin }}"
-                password: "{{ k8s_user_pass | password_hash('sha512') }}"
+                password: "{{ Pass_Hash.stdout }}"
                 shell: /bin/bash
                 comment: user will manage kubernets
                 update_password: on_create
