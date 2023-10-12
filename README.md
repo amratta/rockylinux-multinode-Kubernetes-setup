@@ -25,11 +25,19 @@ https://longhorn.io/docs/latest/best-practices/
   * [example video](https://www.youtube.com/watch?v=tDvwGp0CRQs) 
 
 ## Ansible Setup & Configuration 
-ansible core installed rocky linux 8.x  
+ansible core installed RockyLinux (8.x,9.x)
 use the following commands as root
+
+Rocky8.x
 ```ini 
 yum install ansible-core.x86_64 git python38-pip.noarch vim -y 
 pip3.8 install netaddr
+ansible-galaxy collection install ansible.netcommon community.general kubernetes.core community.crypto
+```
+Rocky9.x
+```ini 
+yum install ansible-core.x86_64 git python3-pip.noarch vim -y 
+pip install netaddr
 ansible-galaxy collection install ansible.netcommon community.general kubernetes.core community.crypto
 ```
 ## Clone Git Repo
