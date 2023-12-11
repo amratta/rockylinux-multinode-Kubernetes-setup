@@ -132,15 +132,32 @@
                - { src: "../templates/MetaLB-IP-Pool.j2", dest: "/k8s-multinodes-yamls/MetaLB-IP-Pool.yml" }
                - { src: "../files/verify.yml", dest: "/k8s-multinodes-yamls/verify.yml" }
                - { src: "../files/longhorn-ingress.yml", dest: "/k8s-multinodes-yamls/longhorn-ingress.yml" }
-               - { src: "../templates/muluts.j2", dest: "/k8s-multinodes-yamls/muluts.yml" }
+            
+           - name: upload multus ipvlan      
+             template:
+               src: "../templates/multus-ipvlan.j2"
+               dest: "/k8s-multinodes-yamls/multus.yml"
+             when: 
+               - use_macvlan == false
+                 
+           - name: upload multus 
+             template:
+               src: "../templates/multus-macvlan.j2"
+               dest: "/k8s-multinodes-yamls/multus.yml"
+             when:
+               - use_macvlan == true 
 
-           - name: Install Multus CNI Plugin 
+           - name: Install Multus & Whereabouts Plugins
              block:
-               - name: Git multus cni plugin
+               - name: Clone git repos
                  ansible.builtin.git:
-                   repo: "{{ Multus_URL }}"
-                   dest: /tmp/multus-cni
-       
+                   depth: 1
+                   repo: "{{ item.repo }}"
+                   dest: "{{ item.dest }}"
+                 loop:
+                   - { repo: "{{ Multus_URL }}" , dest: /tmp/multus-cni }
+                   - { repo: "{{ Whereabouts_URL }}", dest: /tmp/Whereabouts }
+
                - name: Install Muluts & MetaLB
                  shell:
                    cmd: "{{ item }}"
@@ -153,8 +170,21 @@
                    - kubectl wait --for=condition=Ready pod --all=true --namespace metallb-system --timeout 60m  
                    - kubectl apply -f /k8s-multinodes-yamls/MetaLB-IP-Pool.yml
                    - kubectl apply -f /tmp/multus-cni/deployments/multus-daemonset-thick.yml 
-                   - kubectl apply -f /k8s-multinodes-yamls/muluts.yml 
-                   - kubectl wait --for=condition=Ready pod --all=true --all-namespaces=true --timeout 60m  
+                   - kubectl apply -f /k8s-multinodes-yamls/multus.yml 
+                   - kubectl wait --for=condition=Ready pod --all=true --all-namespaces=true --timeout 60m
+                 
+               - name: Install Whereabouts
+                 shell:
+                   cmd: "{{ item }}"
+                   chdir: /tmp/Whereabouts   
+                 environment:
+                   - KUBECONFIG: /etc/kubernetes/admin.conf
+                 async: 3600
+                 poll: 10
+                 loop:
+                   - kubectl apply -f doc/crds/daemonset-install.yaml 
+                   - kubectl apply -f doc/crds/whereabouts.cni.cncf.io_ippools.yaml  
+                   - kubectl apply -f doc/crds/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml 
 
            - name: Install Nginx Ingress Controller 
              block: 
