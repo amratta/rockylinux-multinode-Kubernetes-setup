@@ -371,6 +371,7 @@ Playbook with roles have alot of variables but in general you need to define the
 |set_k8s_service_domain | Boolean | true/false | Default: false   ,If set to true kubernetes Pods and Services DNS records will be created with the domain defined in domain_name variable | 
 | MetaLB_Pool_Name | String | "public" | default: "public"  MetaLB LoadBalancer IP Pool name  
 | MetaLB_IP_Pool | List of Strings | "192.168.1.l00-192.168.1.250" | No default. public ip address you can reach from your PC for more info  refer to MetaLB web site |
+| use_macvlan    | Boolean | true/false  | Default: false mean use ipvlan , when true mean use macvlan in whereabouts CNI plugin please check [whereabouts](https://github.com/k8snetworkplumbingwg/whereabouts) |    
 
 #### Longhorn Config Variables 
 
