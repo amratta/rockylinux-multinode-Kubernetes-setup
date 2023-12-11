@@ -133,14 +133,14 @@
                - { src: "../files/verify.yml", dest: "/k8s-multinodes-yamls/verify.yml" }
                - { src: "../files/longhorn-ingress.yml", dest: "/k8s-multinodes-yamls/longhorn-ingress.yml" }
             
-           - name: upload multus ipvlan      
+           - name: upload ipvlan config     
              template:
                src: "../templates/multus-ipvlan.j2"
                dest: "/k8s-multinodes-yamls/multus.yml"
              when: 
                - use_macvlan == false
                  
-           - name: upload multus 
+           - name: upload macvlan config 
              template:
                src: "../templates/multus-macvlan.j2"
                dest: "/k8s-multinodes-yamls/multus.yml"
