@@ -1,0 +1,28 @@
+ - block:
+    - name: get k8s join command
+      shell:
+         cmd: kubeadm token create --print-join-command
+      environment:
+       - KUBECONFIG: /etc/kubernetes/admin.conf
+      async: 3600
+      poll: 10
+      loop:
+      register: join_command
+
+    - name: add join command to dummy host
+      add_host:
+        name: "k8s_command_holder"
+        join_cmd: "{{ join_command.stdout }}"
+
+    - name: display cluster join command 
+      debug:
+        msg: "{{ hostvars['k8s_command_holder']['join_cmd'] }}"
+   
+   when: inventory_hostname in groups['control_nodes']
+     
+ - name: join workers nodes
+   shell:
+     cmd: "{{ hostvars['k8s_command_holder']['join_cmd'] }}"
+   async: 600
+   poll: 10
+   when: inventory_hostname in groups['worker_nodes']

@@ -1,0 +1,99 @@
+ - shell:
+     cmd: "ip address show to {{ k8s_internal_network }} | grep inet  | awk -F' ' '{ print $2 }' | xargs ipcalc -p | awk -F'=' '{ print $2 }'"
+   register: Prefix
+
+ - shell:
+     cmd: "ip address show to {{ k8s_internal_network }} | grep inet | sed -e 's/\\/{{ Prefix.stdout }}//g' | awk '{print $2}'"
+   register: ControlPlane_Internal_IP
+      
+ - shell:
+     cmd: python3 -c "from passlib.hash import sha512_crypt; import getpass; print (sha512_crypt.encrypt( '{{ k8s_user_pass }}' ))"
+   register: Pass_Hash
+
+ - name: Add cluster admin user in controlplane node
+   ansible.builtin.user:
+     name: "{{ k8s_user_admin }}"
+     password: "{{ Pass_Hash.stdout }}"
+     shell: /bin/bash
+     comment: user will manage kubernets
+     update_password: on_create
+
+ - name: Intialize kubeadmin without internal subnet 
+   shell:
+     cmd: kubeadm init --pod-network-cidr={{ Pods_CIDR }}  --apiserver-advertise-address={{ ansible_default_ipv4.address }} 
+   async: 3600
+   poll: 600      
+   when: 
+     - use_k8s_network == false 
+     - set_k8s_service_domain == false
+
+ - name: Intialize kubeadmin with internal subnet
+   shell:
+     cmd: kubeadm init --pod-network-cidr={{ Pods_CIDR }} --apiserver-advertise-address={{ ControlPlane_Internal_IP.stdout }}
+   async: 3600
+   poll: 5
+   when: 
+     - use_k8s_network == true 
+     - set_k8s_service_domain == false
+
+ - name: Intialize kubeadmin without internal subnet 
+   shell:
+     cmd: kubeadm init --pod-network-cidr={{ Pods_CIDR }} --service-dns-domain={{ domain_name }} --apiserver-advertise-address={{ ansible_default_ipv4.address }}
+   async: 3600
+   poll: 5
+   when:
+     - use_k8s_network == false
+     - set_k8s_service_domain == true
+
+ - name: Intialize kubeadmin with internal subnet
+   shell:
+     cmd: kubeadm init --pod-network-cidr={{ Pods_CIDR }} --apiserver-advertise-address={{ ControlPlane_Internal_IP.stdout }} --service-dns-domain={{ domain_name }} 
+   async: 3600
+   poll: 5
+   when:
+     - use_k8s_network == true
+     - set_k8s_service_domain == true
+ 
+ - name: Download Tigera Custom Resource
+   get_url:
+     url: "{{ item.src }}"
+     dest: "{{ item.dest }}"
+   loop:
+     - { src: '{{ Calico_Custom_Res_URL }} ', dest: "/k8s-multinodes-yamls/custom-resources.yml" }
+     - { src: '{{ MetaLB_URL }}' , dest: "/k8s-multinodes-yamls/metallb-native.yml" }
+
+ - name: edit pods CIDR for Calico Tigera
+   lineinfile:
+     path: "/k8s-multinodes-yamls/custom-resources.yml"
+     regex: '^\s{1,}cidr: 192.168.0.0/16'
+     line: '      cidr: {{ Pods_CIDR }}'
+   when: Pods_CIDR != "192.168.0.0/16"   
+
+ - name: create .kube dir
+   ansible.builtin.file:
+    path: /root/.kube
+    state: directory
+    mode: '0600'
+    owner: root
+    group: root
+
+ - name: copy kube config 
+   ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    owner: root
+    group: root
+    mode: '0400'
+    remote_src: yes  
+
+ - name: Apply Calico Tigera network module
+   shell:
+     cmd: "{{ item }}"
+   environment:
+     - KUBECONFIG: /etc/kubernetes/admin.conf
+   async: 3600
+   poll: 10
+   loop:
+     - kubectl create -f "{{ Calico_Tigera_URL }}" 
+     - kubectl apply -f /k8s-multinodes-yamls/custom-resources.yml
+     - kubectl wait --for=condition=Ready pod --all=true --all-namespaces=true --timeout 60m

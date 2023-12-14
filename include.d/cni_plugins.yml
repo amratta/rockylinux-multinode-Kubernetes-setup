@@ -1,0 +1,46 @@
+ - name: MetaLLB
+   shell:
+     cmd: "{{ item }}"
+   environment:
+     - KUBECONFIG: /etc/kubernetes/admin.conf
+   async: 3600
+   poll: 10
+   loop:
+     - kubectl apply -f /k8s-multinodes-yamls/metallb-native.yml
+     - kubectl wait --for=condition=Ready pod --all=true --namespace metallb-system --timeout 60m
+     - kubectl apply -f /k8s-multinodes-yamls/MetaLB-IP-Pool.yml
+
+ - block:  
+      - name: Clone CNI Repos
+        ansible.builtin.git:
+          depth: 1
+          repo: "{{ item.repo }}"
+          dest: "{{ item.dest }}"
+        loop:
+          - { repo: "{{ Multus_URL }}" , dest: /tmp/multus-cni }
+          - { repo: "{{ Whereabouts_URL }}", dest: /tmp/Whereabouts }
+     
+      - name: Install Multus 
+        shell:
+          cmd: "{{ item }}"
+        environment:
+          - KUBECONFIG: /etc/kubernetes/admin.conf
+        async: 3600
+        poll: 10
+        loop:
+          - kubectl apply -f /tmp/multus-cni/deployments/multus-daemonset-thick.yml 
+          - kubectl apply -f /k8s-multinodes-yamls/multus.yml 
+          - kubectl wait --for=condition=Ready pod --all=true --all-namespaces=true --timeout 60m
+      
+      - name: Install Whereabouts
+        shell:
+          cmd: "{{ item }}"
+          chdir: /tmp/Whereabouts   
+        environment:
+          - KUBECONFIG: /etc/kubernetes/admin.conf
+        async: 3600
+        poll: 10
+        loop:
+          - kubectl apply -f doc/crds/daemonset-install.yaml -f doc/crds/whereabouts.cni.cncf.io_ippools.yaml -f doc/crds/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml 
+   
+   when: set_network_storage

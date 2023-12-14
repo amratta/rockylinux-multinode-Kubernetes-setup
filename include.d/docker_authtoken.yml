@@ -1,0 +1,20 @@
+- name: Remove Docker Authtoken
+  block:
+    - name: Remove Docker authentication
+      ansible.builtin.lineinfile:
+        path: /etc/containerd/config.toml
+        regex: "{{ item }}"
+        state: absent
+      loop:
+        - '^(\s+)\[plugins."io.containerd.grpc.v1.cri".registry.configs."{{ Docker_Registry }}".auth]'
+        - '^(\s+)auth = "{{ dockerhub_token }}"'
+          
+    - name: Restart Containerd
+      ansible.builtin.service:
+        name: "containerd"
+        state: restarted
+        enabled: yes
+  when:
+    - bootstrap_only == true
+    - dockerhub_auth == true
+

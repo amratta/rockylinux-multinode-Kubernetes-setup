@@ -1,0 +1,35 @@
+ - name: kubectl&helm auto-completion
+   shell:
+     cmd: "{{ item }}" 
+   loop:
+     - "kubectl completion bash | tee /etc/bash_completion.d/kubectl > /dev/null"
+     - "helm completion bash > /etc/bash_completion.d/helm"
+   environment:
+     - KUBECONFIG: /etc/kubernetes/admin.conf
+
+ - name: confgure kubectl for admin user
+   ansible.builtin.file:
+     path: "{{ Default_Home_Path }}/{{ k8s_user_admin }}/.kube"
+     owner: "{{ k8s_user_admin }}"
+     group: "{{ k8s_user_admin }}"
+     state: directory
+     mode: '0770'
+
+ - name: edit config for admin user 
+   ansible.builtin.copy:
+     src: "/etc/kubernetes/admin.conf"
+     dest: "{{ Default_Home_Path }}/{{ k8s_user_admin }}/.kube/config"
+     owner: "{{ k8s_user_admin }}"
+     group: "{{ k8s_user_admin }}"
+     remote_src: yes
+     mode: '0400'
+
+ - name: create test deployment & statefulset
+   shell:
+     cmd: "{{ item }}"
+   environment:
+     - KUBECONFIG: /etc/kubernetes/admin.conf
+   async: 3600
+   poll: 10
+   loop:
+     - kubectl apply -f /k8s-multinodes-yamls/verify.yml

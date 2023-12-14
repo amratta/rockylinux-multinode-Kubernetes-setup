@@ -1,0 +1,48 @@
+ - name: create private key (RSA, 4096 bits)
+   community.crypto.openssl_privatekey:
+     path: /tmp/longhorn.key
+
+ - name: create simple self-signed certificate
+   community.crypto.x509_certificate:
+     path: /tmp/longhorn.pem
+     privatekey_path: /tmp/longhorn.key
+     provider: selfsigned
+
+ - name: install longhorn with storage network
+   shell:
+    cmd: kubectl apply -f "{{ Longhorn_URL }}" -f /k8s-multinodes-yamls/longhorn-sn.yml
+   environment:
+       - KUBECONFIG: /etc/kubernetes/admin.conf
+   async: 3600
+   poll: 10
+   loop:
+   when: set_network_storage   
+  
+ - name: install longhorn with default storage network
+   shell:
+     cmd: "{{ item }}"
+   environment:
+        - KUBECONFIG: /etc/kubernetes/admin.conf
+   async: 3600
+   poll: 10
+   loop:
+     - kubectl apply -f "{{ Longhorn_URL }}"
+   when: not set_network_storage    
+       
+ - name: continue longhorn installation
+   shell:
+     cmd: "{{ item }}"
+   environment:
+        - KUBECONFIG: /etc/kubernetes/admin.conf
+        - USER: "{{ longhorn_ui_user }}"
+        - PASSWORD: "{{ longhorn_ui_password }}"   
+   async: 3600
+   poll: 10     
+   loop:
+     - kubectl wait --for=condition=Ready pod --all=true --namespace longhorn-system --timeout 60m 
+     - sleep 20  
+     - kubectl wait --for=condition=Ready pod --all=true --namespace longhorn-system --timeout 60m
+     - echo "${USER}:$(openssl passwd -stdin -apr1 <<< ${PASSWORD})" > /tmp/auth 
+     - kubectl -n longhorn-system create secret generic longhorn-auth --from-file=/tmp/auth
+     - kubectl apply -f "{{ LonghornRWX_URL }}"
+     - kubectl apply -f /k8s-multinodes-yamls/longhorn-ingress.yml  

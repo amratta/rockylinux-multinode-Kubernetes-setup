@@ -49,11 +49,6 @@
      [keyfile]
      unmanaged-devices=interface-name:cali*;interface-name:tunl*;interface-name:vxlan.calico;interface-name:vxlan-v6.calico;interface-name:wireguard.cali;interface-name:wg-v6.cali
 
- - name: set kubectl  configuration to root user
-   ansible.builtin.lineinfile:
-     path: /etc/profile.d/k8s-cluster.sh
-     line: "export KUBECONFIG=/etc/kubernetes/admin.conf"
-
  - name: remove swap line
    ansible.builtin.lineinfile:
      path: /etc/fstab
