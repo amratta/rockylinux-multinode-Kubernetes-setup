@@ -1,5 +1,9 @@
- - name: MetaLLB
-   shell:
+ - name: metallb installation 
+   get_url:
+     url: "{{ MetaLB_URL }}"
+     dest: "/k8s-multinodes-yamls/metallb-native.yml"
+
+ - shell:
      cmd: "{{ item }}"
    environment:
      - KUBECONFIG: /etc/kubernetes/admin.conf
@@ -11,7 +15,7 @@
      - kubectl apply -f /k8s-multinodes-yamls/MetaLB-IP-Pool.yml
 
  - block:  
-      - name: Clone CNI Repos
+      - name: download cni repos
         ansible.builtin.git:
           depth: 1
           repo: "{{ item.repo }}"
@@ -20,7 +24,7 @@
           - { repo: "{{ Multus_URL }}" , dest: /tmp/multus-cni }
           - { repo: "{{ Whereabouts_URL }}", dest: /tmp/Whereabouts }
      
-      - name: Install Multus 
+      - name: install cni plugins
         shell:
           cmd: "{{ item }}"
         environment:
@@ -28,19 +32,12 @@
         async: 3600
         poll: 10
         loop:
-          - kubectl apply -f /tmp/multus-cni/deployments/multus-daemonset-thick.yml 
-          - kubectl apply -f /k8s-multinodes-yamls/multus.yml 
-          - kubectl wait --for=condition=Ready pod --all=true --all-namespaces=true --timeout 60m
-      
-      - name: Install Whereabouts
-        shell:
-          cmd: "{{ item }}"
-          chdir: /tmp/Whereabouts   
-        environment:
-          - KUBECONFIG: /etc/kubernetes/admin.conf
-        async: 3600
-        poll: 10
-        loop:
-          - kubectl apply -f doc/crds/daemonset-install.yaml -f doc/crds/whereabouts.cni.cncf.io_ippools.yaml -f doc/crds/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml 
+          - kubectl apply -f /tmp/Whereabouts/doc/crds/daemonset-install.yaml 
+          - kubectl apply -f /tmp/Whereabouts/doc/crds/whereabouts.cni.cncf.io_ippools.yaml 
+          - kubectl apply -f /tmp/Whereabouts/doc/crds/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml
+          - kubectl wait --for=condition=Ready pod --all=true --namespace kube-system --timeout 60m
+          - kubectl apply -f /tmp/multus-cni/deployments/multus-daemonset.yml
+          - kubectl wait --for=condition=Ready pod --all=true --namespace kube-system --timeout 60m  
+          - kubectl apply -f /k8s-multinodes-yamls/multus.yml  
    
    when: set_network_storage

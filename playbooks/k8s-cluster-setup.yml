@@ -17,7 +17,7 @@
          ansible.builtin.include_tasks: "../include.d/cluster_initialize.yml"
          when: inventory_hostname in groups['control_nodes']
 
-       - name: cluster_initialzation
+       - name: join nodes
          ansible.builtin.include_tasks: "../include.d/join_workers.yml"
 
        - name: Cluster playbooks
