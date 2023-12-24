@@ -24,7 +24,7 @@
           - { repo: "{{ Multus_URL }}" , dest: /tmp/multus-cni }
           - { repo: "{{ Whereabouts_URL }}", dest: /tmp/Whereabouts }
      
-      - name: install cni plugins
+      - name: install whereabouts 
         shell:
           cmd: "{{ item }}"
         environment:
@@ -36,6 +36,15 @@
           - kubectl apply -f /tmp/Whereabouts/doc/crds/whereabouts.cni.cncf.io_ippools.yaml 
           - kubectl apply -f /tmp/Whereabouts/doc/crds/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml
           - kubectl wait --for=condition=Ready pod --all=true --namespace kube-system --timeout 60m
+
+      - name: install multus
+        shell:
+          cmd: "{{ item }}"
+        environment:
+          - KUBECONFIG: /etc/kubernetes/admin.conf
+        async: 3600
+        poll: 10
+        loop:
           - kubectl apply -f /tmp/multus-cni/deployments/multus-daemonset.yml
           - kubectl wait --for=condition=Ready pod --all=true --namespace kube-system --timeout 60m  
           - kubectl apply -f /k8s-multinodes-yamls/multus.yml  
