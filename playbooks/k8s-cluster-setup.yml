@@ -36,8 +36,8 @@
     
            - name: finalize installation 
              ansible.builtin.include_tasks: "../include.d/finalize.yml"
-    
-           - name: docker authtoken
-             ansible.builtin.include_tasks: "../include.d/docker_authtoken.yml"
 
          when: inventory_hostname in groups['control_nodes']
+        
+       - name: docker authtoken
+         ansible.builtin.include_tasks: "../include.d/docker_authtoken.yml"
