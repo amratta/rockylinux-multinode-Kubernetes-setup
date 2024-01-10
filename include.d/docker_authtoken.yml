@@ -15,6 +15,4 @@
         state: restarted
         enabled: yes
   when:
-    - bootstrap_only == true
     - dockerhub_auth == true
-

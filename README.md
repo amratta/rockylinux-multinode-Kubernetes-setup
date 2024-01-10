@@ -110,8 +110,6 @@ These is the most general variables you will need in installation for more optio
 ```
  - dockerhub_auth: true/false
  - dockerhub_token: "docker_auth_token"
- - bootstrap_only: false
-
 
  - TimeZone: "TimeZone"
  - use_k8s_network: true/false       
@@ -287,8 +285,6 @@ vim /etc/ansible/playbooks/vars.yml
 ```init
  - dockerhub_auth: false
  - dockerhub_token: ""
- - bootstrap_only: false
-
 
  - TimeZone: "Africa/Cairo"
  - use_k8s_network: true
@@ -354,7 +350,6 @@ Playbook with roles have alot of variables but in general you need to define the
 | --------- | ------ | ---------- | ------------ |
 | dockerhub_auth | Boolean | true/false  | Default: false authenticate to docker hub default false, Please check docker pull limits |
 | dockerhub_token | String | "AuthToken" | Docker hub auth token please refer to docker site, after login to docker usign docker login command token will be in file $HOME/.docker/config.json |
-| bootstrap_only | Boolean |  true/false | Default: false use authentication during cluster installation only, if true and docker_atuh is true docker token will be removed from containred after installation |   
 
 
 #### Kubernets Cluster Config Variables
