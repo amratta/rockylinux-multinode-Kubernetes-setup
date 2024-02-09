@@ -6,6 +6,7 @@
      state: present
    vars:
      RPMs:
+      - python3 
       - python3-passlib.noarch       
       - python3-cryptography
       - python3-pyyaml      
