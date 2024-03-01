@@ -129,17 +129,19 @@
    when:
      - inventory_hostname in groups['control_nodes']
 
- - name: Get helm
-   ansible.builtin.unarchive:
-     src: "{{ Helm_URL }}"
-     dest: /tmp
-     remote_src: yes
+ - name: Download helm script
+   ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
+    dest: /tmp/get_helm.sh
+    mode: '0700'
    when:
-     - inventory_hostname in groups['control_nodes']
+    - inventory_hostname in groups['control_nodes']
 
  - name: install helm
    shell:
-     cmd: "mv /tmp/linux-amd64/helm /usr/local/bin/helm"
+     cmd: "bash /tmp/get_helm.sh"
+   async: 3600
+   poll: 10
    when:
      - inventory_hostname in groups['control_nodes']
 
