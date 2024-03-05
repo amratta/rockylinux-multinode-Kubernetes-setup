@@ -1,0 +1,17 @@
+ - name: upload patch file
+   template:
+    src: "../files/metrics-patch.yml"
+    dest: "/k8s-multinodes-yamls/metrics-patch.yml"
+    mode: '0755'  
+
+ - name: install metrics server 
+   shell:
+    cmd: "{{ item }}"
+   environment:
+       - KUBECONFIG: /etc/kubernetes/admin.conf
+   async: 3600
+   poll: 10
+   loop:
+     - kubectl apply -f "{{ Metrics_Server_URL }}"
+     - sleep 20
+     - /k8s-multinodes-yamls/metrics-patch.yml  

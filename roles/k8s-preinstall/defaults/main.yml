@@ -11,6 +11,7 @@ Longhorn_URL: "https://raw.githubusercontent.com/longhorn/longhorn/v1.6.0/deploy
 Multus_URL: "https://github.com/k8snetworkplumbingwg/multus-cni.git" 
 Nginx_Ingress_URL: "https://kubernetes.github.io/ingress-nginx"
 Whereabouts_URL: "https://github.com/k8snetworkplumbingwg/whereabouts"
+Metrics_Server_URL: "https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml"
 Default_Home_Path: "/home"
 k8s_user_admin: "admin"
 k8s_user_pass: "Password"

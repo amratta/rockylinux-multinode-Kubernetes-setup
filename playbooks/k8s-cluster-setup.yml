@@ -33,7 +33,10 @@
     
            - name: install longhorn
              ansible.builtin.include_tasks: "../include.d/longhorn.yml"
-    
+            
+           - name: install metrics server
+             ansible.builtin.include_tasks: "../include.d/metrics-server.yml"
+
            - name: finalize installation 
              ansible.builtin.include_tasks: "../include.d/finalize.yml"
 
