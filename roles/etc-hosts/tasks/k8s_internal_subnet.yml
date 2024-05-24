@@ -13,6 +13,8 @@
 
  - shell:
      cmd:  "echo {{ Internal_IP.stdout }} {{ inventory_hostname }} {{ inventory_hostname }}.{{ domain_name }} >> /tmp/hosts"
+   delegate_to: 127.0.0.1
+
 
  - ansible.builtin.copy:
      src: /tmp/hosts
