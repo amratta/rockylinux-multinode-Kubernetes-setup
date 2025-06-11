@@ -1,5 +1,5 @@
 # k8s-cluster-setup.yml
-This playbook will install multinode kubernete cluster, one control-plane node and multi worker nodes with containerd, helm, longhorn, multus,and MetalLB on RockyLinux (8.x,9.x) 
+This playbook will install multinode kubernete cluster, one control-plane node and multi worker nodes with containerd, helm, longhorn, multus,and MetalLB on RockyLinux 9 
 
  Please refer to the minimum requirements before beginning.
 ```
@@ -9,7 +9,8 @@ https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-ku
 https://longhorn.io/docs/latest/best-practices/
 ```
 ## Cluster Nodes Requrements (Best Practice)
-- One control plane node, At least 3 worker nodes ( to get longhorn disks in healthy state 3 worker nodes is required ) with Kubernetes and longhorn minimum requirements
+- One control plane node, One worker node ( you will need to update longhorn storage class numberOfReplicas) 
+- Recomended 3 worker nodes
 - Root Access 
 - Internet access 
 - A dedicated network for internal kubernetes communication (kubernetes propagation network) is highly recommended for best practice.    
@@ -28,12 +29,6 @@ https://longhorn.io/docs/latest/best-practices/
 ansible core installed RockyLinux (8.x,9.x)
 use the following commands as root
 
-Rocky8.x
-```ini 
-yum install ansible-core.x86_64 git python38-pip.noarch vim -y 
-pip3.8 install netaddr
-ansible-galaxy collection install ansible.netcommon community.general kubernetes.core community.crypto
-```
 Rocky9.x
 ```ini 
 yum install ansible-core.x86_64 git python3-pip.noarch vim -y 
@@ -390,16 +385,17 @@ Playbook with roles have alot of variables but in general you need to define the
 
 #### Default URLs and System Values 
 Cluster resources URL 
-| Name                  |  Values                                                                                                   |
-| --------------------- | ----------------------------------------------------------------------------------------------------------|
-| Calico_Tigera_URL     | "https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/tigera-operator.yaml"           |            
-| Calico_Custom_Res_URL | "https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/custom-resources.yaml"          |
-| MetaLB_URL            | "https://raw.githubusercontent.com/metallb/metallb/v0.13.10/config/manifests/metallb-native.yaml"         | 
-| Longhorn_URL          | "https://raw.githubusercontent.com/longhorn/longhorn/v1.4.2/deploy/longhorn.yaml"                         |
-| LonghornRWX_URL       | "https://raw.githubusercontent.com/longhorn/longhorn/master/examples/rwx/storageclass-migratable.yaml"    |
-| Multus_URL            | "https://github.com/k8snetworkplumbingwg/multus-cni.git"                                                  |
-| Helm_URL              | "https://get.helm.sh/helm-v3.11.3-linux-amd64.tar.gz"                                                     |
-| Nginx_Ingress_URL     | "https://kubernetes.github.io/ingress-nginx"                                                              |
-| Docker_Registry:      | "registry-1.docker.io"                                                                                    | 
+| Name                           |  Values                                                                                                   |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------|
+| Calico_Tigera_Operator_CRDS    | "https://raw.githubusercontent.com/projectcalico/calico/v3.30.1/manifests/operator-crds.yaml              |
+| Calico_Tigera_Operator         | "https://raw.githubusercontent.com/projectcalico/calico/v3.30.1/manifests/tigera-operator.yaml"           |
+| Calico_Custom_Res_URL          | "https://raw.githubusercontent.com/projectcalico/calico/v3.30.1/manifests/custom-resources.yaml"          |
+| MetaLB_URL                     | "https://raw.githubusercontent.com/metallb/metallb/v0.13.10/config/manifests/metallb-native.yaml"         | 
+| Longhorn_URL                   | "https://raw.githubusercontent.com/longhorn/longhorn/v1.4.2/deploy/longhorn.yaml"                         |
+| LonghornRWX_URL                | "https://raw.githubusercontent.com/longhorn/longhorn/master/examples/rwx/storageclass-migratable.yaml"    |
+| Multus_URL                     | "https://github.com/k8snetworkplumbingwg/multus-cni.git"                                                  |
+| Helm_URL                       | "https://get.helm.sh/helm-v3.11.3-linux-amd64.tar.gz"                                                     |
+| Nginx_Ingress_URL              | "https://kubernetes.github.io/ingress-nginx"                                                              |
+| Docker_Registry:               | "registry-1.docker.io"                                                                                    | 
 
 

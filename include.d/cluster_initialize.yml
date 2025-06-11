@@ -88,11 +88,24 @@
  - name: apply calico tigera network module
    shell:
      cmd: "{{ item }}"
+   async: 3600
+   poll: 10
+   environment:
+     - KUBECONFIG: /etc/kubernetes/admin.conf
+   loop:
+     - kubectl create -f "{{ Calico_Tigera_Operator_CRDS }}"
+     - kubectl create -f "{{ Calico_Tigera_Operator }}"
+     - kubectl apply -f /k8s-multinodes-yamls/custom-resources.yml
+
+ - name: wait for calico pods to be ready
+   shell:
+     cmd: kubectl wait --for=condition=Ready pod --all=true -n "{{ item }}" --timeout 60m
    environment:
      - KUBECONFIG: /etc/kubernetes/admin.conf
    async: 3600
    poll: 10
    loop:
-     - kubectl create -f "{{ Calico_Tigera_URL }}" 
-     - kubectl apply -f /k8s-multinodes-yamls/custom-resources.yml
-     - kubectl wait --for=condition=Ready pod --all=true --all-namespaces=true --timeout 60m
+     - calico-apiserver
+     - calico-system
+     - kube-system
+     - tigera-operator
