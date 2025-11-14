@@ -103,7 +103,6 @@
    async: 3600
    poll: 10
    loop:
-     - calico-apiserver
-     - calico-system
      - kube-system
+     - calico-system
      - tigera-operator
