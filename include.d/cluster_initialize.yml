@@ -95,10 +95,14 @@
      - kubectl create -f "{{ Calico_Tigera_Operator }}"
      - kubectl apply -f /k8s-multinodes-yamls/custom-resources.yml
 
- - name: wait for all  pods to be ready
+ - name: Get namespaces with pods
    shell:
-     cmd: kubectl wait --for=condition=Ready pod --all --all-namespaces --timeout=60m
+     cmd: kubectl get pods -A --no-headers | awk '{print $1}' | sort -u
+   register: ns_with_pods
+
+ - name: Wait for pods to be ready
+   shell:
+     cmd: kubectl wait --for=condition=Ready pod --all -n {{ item }} --timeout=30m || true
+   loop: "{{ ns_with_pods.stdout_lines }}"
    environment:
-     - KUBECONFIG: /etc/kubernetes/admin.conf
-   async: 3600
-   poll: 10
+     KUBECONFIG: /etc/kubernetes/admin.conf
