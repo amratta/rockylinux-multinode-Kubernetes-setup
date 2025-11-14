@@ -31,16 +31,13 @@ use the following commands as root
 
 Rocky9.x
 ```ini 
-yum install ansible-core.x86_64 git python3-pip.noarch vim -y 
-pip install netaddr
-ansible-galaxy collection install ansible.netcommon community.general kubernetes.core community.crypto
+yum install ansible-core.x86_64 git python3-pip.noarch vim -y && pip install netaddr && ansible-galaxy collection install ansible.netcommon community.general kubernetes.core community.crypto
 ```
 ## Clone Git Repo
  * Note:  in this document, I assume you have a fresh ansible server 
 clone repo to /etc/ansible
 ```ini
-rm -vrf /etc/ansible/*
-git clone https://github.com/amratta/rockylinux-multinode-Kubernetes-setup.git /etc/ansible
+rm -vrf /etc/ansible/* && git clone https://github.com/amratta/rockylinux-multinode-Kubernetes-setup.git /etc/ansible
 ```
 
 Note If you want to avoid ssh host key checking in /etc/ansible/ansible.cfg file change host_key_checking to False as the following 
