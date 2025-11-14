@@ -1,8 +1,8 @@
  - dockerhub_auth: true/false
  - dockerhub_token: "docker_auth_token"
- - k8s_version: "1.33"      <- kubernetes release Version in x.y format, where x is the major version, y is the minor version eg: 1.29, 1.28, 127 etc   
+ - k8s_version: "1.34"      <- kubernetes release Version in x.y format, where x is the major version, y is the minor version eg: 1.29, 1.28, 127 etc   
 
- - TimeZone: "TimeZone"
+ - TimeZone: "Africa/Cairo"
  - use_k8s_network: true/false       
  - k8s_internal_network: "kubernets propagtion network"
 
