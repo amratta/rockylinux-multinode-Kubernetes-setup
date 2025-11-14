@@ -1,14 +1,14 @@
 ---
 # defaults file for k8s-preinstall
-k8s_version: "1.33"
+k8s_version: "1.34"
 Docker_Registry: "registry-1.docker.io"
 dockerhub_auth: false
 dockerhub_token: ""
-Calico_Tigera_Operator_CRDS: "https://raw.githubusercontent.com/projectcalico/calico/v3.30.1/manifests/operator-crds.yaml"
-Calico_Tigera_Operator: "https://raw.githubusercontent.com/projectcalico/calico/v3.30.1/manifests/tigera-operator.yaml"
-Calico_Custom_Res_URL: "https://raw.githubusercontent.com/projectcalico/calico/v3.30.1/manifests/custom-resources.yaml"
+Calico_Tigera_Operator_CRDS: "https://raw.githubusercontent.com/projectcalico/calico/v3.31.0/manifests/operator-crds.yaml"
+Calico_Tigera_Operator: "https://raw.githubusercontent.com/projectcalico/calico/v3.31.0/manifests/tigera-operator.yaml"
+Calico_Custom_Res_URL: "https://raw.githubusercontent.com/projectcalico/calico/v3.31.0/manifests/custom-resources.yaml"
 MetaLB_URL: "https://raw.githubusercontent.com/metallb/metallb/v0.15.2/config/manifests/metallb-native.yaml"
-Longhorn_URL: "https://raw.githubusercontent.com/longhorn/longhorn/v1.9.0/deploy/longhorn.yaml"
+Longhorn_URL: "https://raw.githubusercontent.com/longhorn/longhorn/v1.10.0/deploy/longhorn.yaml"
 Multus_URL: "https://github.com/k8snetworkplumbingwg/multus-cni.git"
 Nginx_Ingress_URL: "https://kubernetes.github.io/ingress-nginx"
 Whereabouts_URL: "https://github.com/k8snetworkplumbingwg/whereabouts"

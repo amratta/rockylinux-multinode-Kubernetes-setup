@@ -61,12 +61,10 @@
    loop:
      - { src: '{{ Calico_Custom_Res_URL }} ', dest: "/k8s-multinodes-yamls/custom-resources.yml" }
 
- - name: edit pods CIDR for calico tigera
-   lineinfile:
-     path: "/k8s-multinodes-yamls/custom-resources.yml"
-     regex: '^\s{1,}cidr: 192.168.0.0/16'
-     line: '      cidr: {{ Pods_CIDR }}'
-   when: Pods_CIDR != "192.168.0.0/16"   
+ - name: Update Calico CIDR 
+   ansible.builtin.shell: |
+     sed -E -i 's|^([[:space:]]*cidr:)[[:space:]]*[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/[0-9]+|\1 {{ Pods_CIDR | regex_escape }}|' /k8s-multinodes-yamls/custom-resources.yml
+   when: Pods_CIDR != "192.168.0.0/16"
 
  - name: create .kube dir
    ansible.builtin.file:
